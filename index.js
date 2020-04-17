@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dialogflow = require('dialogflow');
 const uuid = require('uuid');
+const cors = require('cors');
+
 const PROJECT_ID = 'civa-boivdp'
 
 process.env.GOOGLE_APPLICATION_CREDENTIALS = './cred.json';
@@ -12,6 +14,7 @@ const sessionClient = new dialogflow.SessionsClient();
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.disable('x-powered-by');
