@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 app.post('/query', (req, res) => {
   let sessionId = req.query.sessionId;
 
-  if (!!sessionId) sessionId = uuid.v4();
+  if (!sessionId) sessionId = uuid.v4();
 
   const sessionPath = sessionClient.sessionPath(PROJECT_ID, sessionId);
 
