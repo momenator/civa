@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const dialogflow = require('dialogflow');
 const uuid = require('uuid');
 const cors = require('cors');
+const path = require('path');
 
 const PROJECT_ID = 'civa-boivdp'
 
@@ -14,13 +15,14 @@ const sessionClient = new dialogflow.SessionsClient();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors())
+app.use(cors());
+app.use(express.static(path.resolve(__dirname, 'build')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.disable('x-powered-by');
 
 app.get('/', (req, res) => {
-  res.send('CIVA API');
+  res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
 
