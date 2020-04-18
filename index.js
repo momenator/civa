@@ -1,9 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const dialogflow = require('dialogflow');
-const uuid = require('uuid');
 const cors = require('cors');
 const path = require('path');
+const { botReply } = require('./bot');
 
 const PROJECT_ID = 'civa-boivdp'
 
@@ -26,42 +26,16 @@ app.get('/', (req, res) => {
 });
 
 
-app.post('/query', (req, res) => {
+app.post('/query', async (req, res) => {
   let sessionId = req.query.sessionId;
-
-  if (!sessionId) sessionId = uuid.v4();
-
-  const sessionPath = sessionClient.sessionPath(PROJECT_ID, sessionId);
-
-  // The text query request.
-  const request = {
-    session: sessionPath,
-    queryInput: {
-      text: {
-        // The query to send to the dialogflow agent
-        text: req.body.query,
-        // The language used by the client (en-US)
-        languageCode: 'en-US',
-      },
-    },
-  };
-
-  // Send request and log result
-  sessionClient.detectIntent(request).then(responses => {
-    console.log('Detected intent');
-    const result = responses[0].queryResult;
-    console.log(`Query: ${result.queryText}`);
-    console.log(`Response: ${result.fulfillmentText}`);
+  try {
+    const reply = await botReply(sessionClient, req.body.query, sessionId);
+    res.json(reply)
+  } catch(e) {
     res.json({
-      response: result.fulfillmentText,
-      sessionId: sessionId,
-    });
-  }).catch(e => {
-    console.log(e);
-    res.json({
-      message: 'ERROR'
-    });
-  })
+      response: 'ERROR',
+    })
+  }
 })
 
 app.listen(port, () => {
