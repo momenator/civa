@@ -1,18 +1,25 @@
 const uuid = require('uuid');
+const natural = require('natural');
 
 const PROJECT_ID = 'civa-boivdp';
 
-const resourceMap = {
-  0: 'Out of stock',
-  1: 'Limited',
-  2: 'Plenty' 
+const ITEMS = ['tissue', 'bread', 'pasta', 'sanitizer'];
+const LOCATIONS = ['maxvorstadt', 'schwabing'];
+
+const pickItem = (item, items) => {
+  for (const i of items) {
+    if (natural.JaroWinklerDistance(i, item) > 0.65) {
+      return i;
+    }
+  }
+  return '';
 }
 
 // supermarket data
 // 0 - out o
 const DATA = [
   {
-    name: 'maxvordstadt',
+    name: 'maxvorstadt',
     stores: [
       {
         name: 'Edeka Express',
@@ -47,7 +54,7 @@ const DATA = [
     ]
   },
   {
-    name: 'schwabing west',
+    name: 'schwabing',
     stores: [
       {
         name: 'Netto City Filiale',
@@ -75,6 +82,9 @@ const DATA = [
 
 const fulfillItemRequest = async (item, location) => {
   try {
+    item = pickItem(item, ITEMS);
+    location = pickItem(location, LOCATIONS);
+
     const place = DATA.filter(d => {
       const name = d.name.toLowerCase();
       return name.includes(location);
@@ -84,7 +94,6 @@ const fulfillItemRequest = async (item, location) => {
       const availableStores = [];
 
       for (const store of place[0].stores) {
-        item = item.toLowerCase();
         if (store[item]) {
           availableStores.push(store);
         }
